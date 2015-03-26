@@ -6,32 +6,32 @@ namespace Reactive.FileSystem
 {
     public class FileSystemObservable : IDisposable
     {
-        readonly FileSystemWatcher watcher;
+        readonly FileSystemWatcher _watcher;
 
         public FileSystemObservable(string path)
         {
-            watcher = new FileSystemWatcher(path);
+            _watcher = new FileSystemWatcher(path);
         }
 
-        public IObservable<string> Changed
+        public IObservable<FileSystemEventArgs> Changed
         {
             get
             {
                 var obs = Observable.FromEventPattern<FileSystemEventHandler, FileSystemEventArgs>(
-                h => watcher.Changed += h,
-                h => watcher.Changed -= h);
+                    h => _watcher.Changed += h,
+                    h => _watcher.Changed -= h);
 
-                return obs.Select(x => x.EventArgs.FullPath);
+                return obs.Select(x => x.EventArgs);
             }
         }
 
-        bool disposed = false;
+        bool _disposed;
         public void Dispose()
         {
-            if (disposed) return;
+            if (_disposed) return;
             
-            watcher.Dispose();
-            disposed = true;
+            _watcher.Dispose();
+            _disposed = true;
         }
     }
 }
